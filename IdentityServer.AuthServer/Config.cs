@@ -1,4 +1,7 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer4;
+using IdentityServer4.Models;
+using IdentityServer4.Test;
+using System.Security.Claims;
 
 namespace IdentityServer.AuthServer
 {
@@ -30,6 +33,29 @@ namespace IdentityServer.AuthServer
                 new ApiScope("api2.update", "API 2 için güncelleme izni")
             };
         }
+               
+        public static IEnumerable<IdentityResource> GetIdentityResources()
+        {
+            return new List<IdentityResource>()
+            {
+                new IdentityResources.OpenId(), //token döndüğünde kullanıcın id'si olmalı(subject id) 
+                new IdentityResources.Profile()  //kullanıcı ile ilgili claim tutulur
+            };
+        }
+
+        public static IEnumerable<TestUser> GetUsers()
+        {
+            return new List<TestUser>()
+            {
+                new TestUser{SubjectId="1", Username="aycatrkmn", Password="Passw0rd.",Claims= new List<Claim>(){
+                new Claim("given_name","Ayça"),
+                new Claim("family_name","Türkmen") }},
+
+                new TestUser{SubjectId="2", Username="ferideclk", Password="Passw0rd.",Claims= new List<Claim>(){
+                new Claim("given_name","Feride"),
+                new Claim("family_name","Çolak") }},
+            };
+        }
 
         public static IEnumerable<Client> GetClients()
         {
@@ -50,6 +76,17 @@ namespace IdentityServer.AuthServer
                     ClientSecrets = new[]{new Secret("secret".Sha256())},
                     AllowedGrantTypes = GrantTypes.ClientCredentials,
                     AllowedScopes={"api1.read","api2.write","api2.update", "api1.update" }
+                },
+                new Client()
+                {
+                    ClientId="Client1-Mvc",
+                    ClientName = "Client 1 app mvc yugulaması",
+                    ClientSecrets= new[]{new Secret("secret".Sha256())},
+                    AllowedGrantTypes=GrantTypes.Hybrid,
+                    RedirectUris = new List<string>{"https://localhost:7131/sign-oidc" },  //token alma işini gerçekleştiren url,cookie 
+                    AllowedScopes = {IdentityServerConstants.StandardScopes.OpenId,IdentityServerConstants.StandardScopes.Profile} //Client hangi izinlere sahip olacak 
+                    //sabit olarak yazdık izinleri fakat "openid" yazsak da olur. Ya da "profile" :
+                    //AllowedScopes = {"openid","profile"},
                 }
             };
         }

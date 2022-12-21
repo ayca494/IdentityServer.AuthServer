@@ -10,6 +10,8 @@ builder.Services.AddIdentityServer()
 .AddInMemoryApiResources(Config.GetApiResources())
 .AddInMemoryApiScopes(Config.GetApiScopes())
 .AddInMemoryClients(Config.GetClients())
+.AddInMemoryIdentityResources(Config.GetIdentityResources())
+.AddTestUsers(Config.GetUsers().ToList())
 .AddDeveloperSigningCredential(); //Uygulama sýrasýnda public ve private key proje içinde tutuyor
 
 //builder.Services.AddAuthentication(JwtBearerDefaults.)
